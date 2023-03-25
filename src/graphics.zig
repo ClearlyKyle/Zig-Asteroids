@@ -1,15 +1,16 @@
 const std = @import("std");
 pub const SDL = @cImport(@cInclude("SDL2/SDL.h"));
 
-//So this makes the file a giant struct?
-const Graphics = @This();
+pub var GrpahicsManager: Graphics = Graphics{}; //init to 0?
 
-window: ?*SDL.SDL_Window = null,
-renderer: ?*SDL.struct_SDL_Renderer = null,
+const Graphics = struct {
+    window: ?*SDL.SDL_Window = null,
+    renderer: ?*SDL.struct_SDL_Renderer = null,
+    width: u16 = 0,
+    height: u16 = 0,
+};
 
-const Self = @This();
-
-pub fn init(width: i16, height: i16, title: []const u8) Self {
+pub fn init(width: u16, height: u16, title: []const u8) void {
     if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0)
         sdlPanic();
 
@@ -26,19 +27,21 @@ pub fn init(width: i16, height: i16, title: []const u8) Self {
     // RENDERER
     const renderer = SDL.SDL_CreateRenderer(window, -1, SDL.SDL_RENDERER_ACCELERATED) orelse sdlPanic();
 
-    return Self{
-        .window = window,
-        .renderer = renderer,
-    };
+    GrpahicsManager.window = window;
+    GrpahicsManager.renderer = renderer;
+    GrpahicsManager.width = width;
+    GrpahicsManager.height = height;
 }
 
-pub fn destroy(self: Graphics) void {
+pub fn destroy() void {
     std.debug.print("Graphics cleanup...\n", .{});
     defer std.debug.print("Graphics cleanup finished!\n", .{});
 
-    _ = SDL.SDL_DestroyWindow(self.window);
-    _ = SDL.SDL_DestroyRenderer(self.renderer);
+    _ = SDL.SDL_DestroyWindow(GrpahicsManager.window);
+    _ = SDL.SDL_DestroyRenderer(GrpahicsManager.renderer);
     _ = SDL.SDL_Quit();
+
+    GrpahicsManager = Graphics{};
 }
 
 fn sdlPanic() noreturn {
