@@ -1,31 +1,16 @@
 const std = @import("std");
 const Graphics = @import("graphics.zig");
 const SDL = Graphics.SDL;
+const Player = @import("player.zig");
+//const Vec2 = @import("vec2.zig");
 
 pub fn main() anyerror!void {
     std.debug.print("Starting program!\n", .{});
 
-    const window = Graphics.init(800, 600, "Asteroids");
-    defer window.destroy();
+    Graphics.init(800, 600, "Asteroids");
+    defer Graphics.destroy();
 
-    // Triangle verticies
-    const vertices = [_]SDL.SDL_Vertex{
-        .{
-            .position = .{ .x = 400, .y = 150 },
-            .color = .{ .r = 255, .g = 0, .b = 0, .a = 255 },
-            .tex_coord = .{ .x = 0, .y = 0 },
-        },
-        .{
-            .position = .{ .x = 200, .y = 450 },
-            .color = .{ .r = 0, .g = 0, .b = 255, .a = 255 },
-            .tex_coord = .{ .x = 0, .y = 0 },
-        },
-        .{
-            .position = .{ .x = 600, .y = 450 },
-            .color = .{ .r = 0, .g = 255, .b = 0, .a = 255 },
-            .tex_coord = .{ .x = 0, .y = 0 },
-        },
-    };
+    const player = Player.player_init();
 
     // Main window loop
     mainLoop: while (true) {
@@ -43,18 +28,12 @@ pub fn main() anyerror!void {
                 else => {},
             }
         }
+        _ = SDL.SDL_SetRenderDrawColor(Graphics.GrpahicsManager.renderer, 0, 0, 0, 255);
+        _ = SDL.SDL_RenderClear(Graphics.GrpahicsManager.renderer);
 
-        _ = SDL.SDL_SetRenderDrawColor(window.renderer, 0, 0, 0, SDL.SDL_ALPHA_OPAQUE);
-        _ = SDL.SDL_RenderClear(window.renderer);
-        _ = SDL.SDL_RenderGeometry(
-            window.renderer,
-            null,
-            &vertices,
-            vertices.len,
-            null,
-            0,
-        );
+        // Render Player
+        player.draw();
 
-        SDL.SDL_RenderPresent(window.renderer);
+        SDL.SDL_RenderPresent(Graphics.GrpahicsManager.renderer);
     }
 }
