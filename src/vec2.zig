@@ -32,6 +32,11 @@ pub fn Vec2(comptime T: type) type {
             return .{ .x = self.x - vec2.x, .y = self.y - vec2.y };
         }
 
+        pub fn scale(self: *Self, s: T) void {
+            self.x *= s;
+            self.y *= s;
+        }
+
         pub fn scaled(self: Self, s: T) Self {
             return .{ .x = self.x * s, .y = self.y * s };
         }
@@ -48,8 +53,25 @@ pub fn Vec2(comptime T: type) type {
             return std.math.sqrt(self.lengthSquared());
         }
 
-        pub fn angle(self: Self) T {
-            return std.math.atan2(T, self.y, self.x);
+        pub fn normalize(self: Self) Self {
+            const len = self.length();
+            return .{ .x = self.x / len, .y = self.y / len };
+        }
+
+        pub fn rotate(self: *Self, degree: f32) Self {
+            //const angle = degree * (std.math.pi / 180.0);
+            const s = std.math.sin(degree);
+            const c = std.math.cos(degree);
+
+            // 2D Rotation Matrix
+            // CARE not to assign new self.x before finishing using the old values
+            const new_x = (self.x * c) - (self.y * s);
+            const new_y = (self.x * s) + (self.y * c);
+
+            return .{
+                .x = new_x,
+                .y = new_y,
+            };
         }
 
         pub fn eql(self: Self, vec2: Self) bool {

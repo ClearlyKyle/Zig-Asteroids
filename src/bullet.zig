@@ -3,8 +3,8 @@ const Graphics = @import("graphics.zig");
 const SDL = Graphics.SDL;
 
 pub const Bullet = struct {
-    x: f32 = 0.0,
-    y: f32 = 0.0,
+    x: f32 = 0.0, // x poisiton on screen
+    y: f32 = 0.0, // y poisiton on screen
     vel_x: f32 = 0.0, //veloctiy in x direction
     vel_y: f32 = 0.0, //veloctiy in y direction
     visible: bool = false, // Should we draw the bullet or not?
