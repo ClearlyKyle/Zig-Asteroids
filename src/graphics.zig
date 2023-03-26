@@ -5,7 +5,7 @@ pub var GrpahicsManager: Graphics = Graphics{}; //init to 0?
 
 const Graphics = struct {
     window: ?*SDL.SDL_Window = null,
-    renderer: ?*SDL.struct_SDL_Renderer = null,
+    renderer: ?*SDL.SDL_Renderer = null,
     width: u16 = 0,
     height: u16 = 0,
 };
