@@ -73,6 +73,7 @@ pub const Game = struct {
             for (&self.asteroids, 0..) |*asteroid, asteroid_index| {
                 if (did_the_bullet_hit_as_asteroid(asteroid.*, self.bullets[index]) and self.bullets[index].visible) {
                     std.debug.print("Bullet hit an asteroid!\n", .{});
+                    self.score += 1;
                     self.bullets[index].visible = false;
 
                     if (asteroid.size > 31.0) // Spawn two new smaller asteroids, baby asteroids
@@ -111,6 +112,10 @@ pub const Game = struct {
         // Update the Player
         screen_wrap(self.player.position.x, self.player.position.y, &self.player.position.x, &self.player.position.y);
         self.player.update(time);
+
+        // Show score and lives
+        const title_text = std.fmt.allocPrint(std.heap.page_allocator, "Score : {}", .{self.score}) catch unreachable; // I think this is sketchy!
+        SDL.SDL_SetWindowTitle(Graphics.GrpahicsManager.window, title_text.ptr);
     }
 
     pub fn fire_bullet(self: *Self) void {
