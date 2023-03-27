@@ -68,6 +68,44 @@ pub const Game = struct {
             {
                 self.bullets[index].visible = false;
             }
+
+            // Check Bullet collision with asteroid :D
+            for (&self.asteroids, 0..) |*asteroid, asteroid_index| {
+                if (did_the_bullet_hit_as_asteroid(asteroid.*, self.bullets[index]) and self.bullets[index].visible) {
+                    std.debug.print("Bullet hit an asteroid!\n", .{});
+                    self.bullets[index].visible = false;
+
+                    if (asteroid.size > 31.0) // Spawn two new smaller asteroids, baby asteroids
+                    {
+                        std.debug.print("Drawing a new Asteroid\n", .{});
+                        const asteroid_verticies_len = @intToFloat(f32, self.asteroid_verticies.len);
+                        const angle1 = std.math.sin((@intToFloat(f32, asteroid_index) / asteroid_verticies_len) * (2.0 * std.math.pi));
+                        const angle2 = std.math.cos((@intToFloat(f32, asteroid_index) / asteroid_verticies_len) * (2.0 * std.math.pi));
+
+                        // update the current asteroid to be half the size
+                        asteroid.*.size /= 2.0;
+                        asteroid.*.vel_x = 10.0 * std.math.sin(angle1);
+                        asteroid.*.vel_y = 10.0 * std.math.cos(angle1);
+                        asteroid.*.angle = 0.0;
+
+                        // now find a free place in the astroid list to put the second new astroid
+                        // as once an asteroid is hit, it splits into two
+                        for (&self.asteroids) |*free_asteroid| {
+                            if (free_asteroid.size < 15.0) {
+                                free_asteroid.x = asteroid.x;
+                                free_asteroid.y = asteroid.y;
+                                free_asteroid.size = asteroid.size;
+                                free_asteroid.vel_x = 10.0 * std.math.sin(angle2);
+                                free_asteroid.vel_y = 10.0 * std.math.cos(angle2);
+                                free_asteroid.angle = 45.0;
+                                break;
+                            }
+                        }
+                    } else {
+                        asteroid.size = 0.0; // asteroid is reached the limit of size and wont be drawn anymore
+                    }
+                }
+            }
         }
 
         // Update the Player
@@ -92,10 +130,13 @@ pub const Game = struct {
         }
     }
 
+    pub fn did_the_bullet_hit_as_asteroid(asteroid: Asteroid, bullet: Bullet) bool {
+        return std.math.sqrt((asteroid.x - bullet.x) * (asteroid.x - bullet.x) + (asteroid.y - bullet.y) * (asteroid.y - bullet.y)) < asteroid.size;
+    }
+
     fn asteroids_draw(self: Self) void {
         for (self.asteroids) |asteroid| {
             if (asteroid.size > 0.0) {
-                std.debug.print("Drawing an Asteroid\n", .{});
                 _ = SDL.SDL_SetRenderDrawColor(Graphics.GrpahicsManager.renderer, 255, 255, 255, 255);
 
                 const vert_count = self.asteroid_verticies.len;
@@ -156,8 +197,8 @@ pub fn game_init() Game {
     game.asteroids[0] = Asteroid{
         .x = SCREEN_WIDTH / 4.0,
         .y = SCREEN_HEIGHT / 4.0,
-        .vel_x = 8.0,
-        .vel_y = -6.0,
+        .vel_x = 16.0,
+        .vel_y = -12.0,
         .angle = 0.0,
         .size = 64,
     };
@@ -165,8 +206,8 @@ pub fn game_init() Game {
     game.asteroids[1] = Asteroid{
         .x = -SCREEN_WIDTH / 4.0,
         .y = -SCREEN_HEIGHT / 4.0,
-        .vel_x = -5.0,
-        .vel_y = 3.0,
+        .vel_x = -10.0,
+        .vel_y = 6.0,
         .angle = 0.0,
         .size = 64,
     };
