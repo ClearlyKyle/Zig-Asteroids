@@ -9,6 +9,7 @@ pub const Player = struct {
     velocity: vec2(f32) = vec2(f32){ .x = 0.0, .y = 0.0 },
     object_verticies: [3]vec2(f32) = undefined,
     trans_verticies: [3]vec2(f32) = undefined,
+
     angle: f32 = 0.0,
 
     const Self = @This();
@@ -27,8 +28,6 @@ pub const Player = struct {
     pub fn update(self: *Self, time: f32) void {
         _ = time; // not used
 
-        self.wrap(); // Stay within the screen
-
         // Rotate
         self.trans_verticies[0] = self.object_verticies[0].rotate(self.angle);
         self.trans_verticies[1] = self.object_verticies[1].rotate(self.angle);
@@ -45,22 +44,6 @@ pub const Player = struct {
     pub fn move(self: *Self, amount: f32) void {
         self.velocity.x += std.math.sin(self.angle) * amount;
         self.velocity.y += -std.math.cos(self.angle) * amount;
-    }
-
-    // Stay within the bounds of the screen with wrapping
-    pub fn wrap(self: *Self) void {
-        const width = @intToFloat(f32, Graphics.GrpahicsManager.width);
-        const height = @intToFloat(f32, Graphics.GrpahicsManager.height);
-
-        if (self.position.x < 0.0)
-            self.position.x += width;
-        if (self.position.x >= width)
-            self.position.x -= width;
-
-        if (self.position.y < 0.0)
-            self.position.y += height;
-        if (self.position.y >= height)
-            self.position.y -= height;
     }
 };
 

@@ -65,6 +65,21 @@ pub const Game = struct {
     }
 };
 
+// Stay within the bounds of the screen with wrapping
+fn screen_wrap(current_x: f32, current_y: f32, new_x: *f32, new_y: *f32) void {
+    new_x.* = current_x;
+    new_y.* = current_y;
+
+    if (current_x < 0.0)
+        new_x.* = current_x + SCREEN_WIDTH;
+    if (current_x >= SCREEN_WIDTH)
+        new_x.* = current_x - SCREEN_WIDTH;
+
+    if (current_y < 0.0)
+        new_y.* = current_y + SCREEN_HEIGHT;
+    if (current_y >= SCREEN_HEIGHT)
+        new_y.* = current_y - SCREEN_HEIGHT;
+}
 pub fn game_init() Game {
     return .{
         .player = Player.player_init(),
