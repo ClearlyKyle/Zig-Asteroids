@@ -58,7 +58,7 @@ pub fn Vec2(comptime T: type) type {
             return .{ .x = self.x / len, .y = self.y / len };
         }
 
-        pub fn rotate(self: *Self, degree: f32) Self {
+        pub fn rotate(self: Self, degree: f32) Self {
             //const angle = degree * (std.math.pi / 180.0);
             const s = std.math.sin(degree);
             const c = std.math.cos(degree);
