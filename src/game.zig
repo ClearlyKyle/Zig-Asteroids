@@ -109,6 +109,15 @@ pub const Game = struct {
             }
         }
 
+        // Check if there are no Asteroids left and spawn some more :D
+        for (self.asteroids) |asteroid| {
+            if (asteroid.size > 15.0)
+                break;
+        } else {
+            // No more asteroids so time to spawn some
+            self.initialise_two_asteroids();
+        }
+
         // Update the Player
         screen_wrap(self.player.position.x, self.player.position.y, &self.player.position.x, &self.player.position.y);
         self.player.update(time);
@@ -160,6 +169,30 @@ pub const Game = struct {
                 }
             }
         }
+    }
+
+    fn initialise_two_asteroids(self: *Self) void {
+        const half_of_pi = std.math.pi / 2.0;
+        _ = half_of_pi;
+        var rnd = RndGen.init(0);
+
+        self.asteroids[0] = Asteroid{
+            .x = self.player.position.x + 50.0 + rnd.random().float(f32) * SCREEN_WIDTH,
+            .y = self.player.position.y + 50.0 + rnd.random().float(f32) * SCREEN_HEIGHT,
+            .vel_x = 16.0 * std.math.sin(self.player.angle),
+            .vel_y = -12.0 * std.math.cos(self.player.angle),
+            .angle = 0.0,
+            .size = 64,
+        };
+
+        self.asteroids[1] = Asteroid{
+            .x = self.player.position.x - 50.0 + rnd.random().float(f32) * SCREEN_WIDTH,
+            .y = self.player.position.y - 50.0 + rnd.random().float(f32) * SCREEN_HEIGHT,
+            .vel_x = -10.0 * std.math.sin(-self.player.angle),
+            .vel_y = 6.0 * std.math.cos(-self.player.angle),
+            .angle = 0.0,
+            .size = 64,
+        };
     }
 };
 
