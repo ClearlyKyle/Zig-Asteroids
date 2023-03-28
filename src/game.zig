@@ -71,7 +71,7 @@ pub const Game = struct {
 
             // Check Bullet collision with asteroid :D
             for (&self.asteroids, 0..) |*asteroid, asteroid_index| {
-                if (did_the_bullet_hit_as_asteroid(asteroid.*, self.bullets[index]) and self.bullets[index].visible) {
+                if (is_there_a_point_inside_the_asteroid(asteroid.*, self.bullets[index].x, self.bullets[index].y) and self.bullets[index].visible) {
                     std.debug.print("Bullet hit an asteroid!\n", .{});
                     self.score += 1;
                     self.bullets[index].visible = false;
@@ -122,6 +122,23 @@ pub const Game = struct {
         screen_wrap(self.player.position.x, self.player.position.y, &self.player.position.x, &self.player.position.y);
         self.player.update(time);
 
+        // Check if the player collides here))
+        for (self.asteroids) |asteroid| {
+            // This way checks the center of the spaceship against an asteroid
+            //if (is_there_a_point_inside_the_asteroid(asteroid, self.player.position.x, self.player.position.y)) {
+            //    self.alive = false;
+            //    break;
+            //}
+
+            //  This way checks all verticies of the spaceship triangle against an asteroid
+            if (is_there_a_point_inside_the_asteroid(asteroid, self.player.trans_verticies[0].x, self.player.trans_verticies[0].y) or
+                is_there_a_point_inside_the_asteroid(asteroid, self.player.trans_verticies[1].x, self.player.trans_verticies[1].y) or
+                is_there_a_point_inside_the_asteroid(asteroid, self.player.trans_verticies[2].x, self.player.trans_verticies[2].y))
+            {
+                self.alive = false;
+                break;
+            }
+        }
         // Show score and lives
         const title_text = std.fmt.allocPrint(std.heap.page_allocator, "Score : {}", .{self.score}) catch unreachable; // I think this is sketchy!
         SDL.SDL_SetWindowTitle(Graphics.GrpahicsManager.window, title_text.ptr);
@@ -144,8 +161,8 @@ pub const Game = struct {
         }
     }
 
-    pub fn did_the_bullet_hit_as_asteroid(asteroid: Asteroid, bullet: Bullet) bool {
-        return std.math.sqrt((asteroid.x - bullet.x) * (asteroid.x - bullet.x) + (asteroid.y - bullet.y) * (asteroid.y - bullet.y)) < asteroid.size;
+    pub fn is_there_a_point_inside_the_asteroid(asteroid: Asteroid, point_x: f32, point_y: f32) bool {
+        return std.math.sqrt((asteroid.x - point_x) * (asteroid.x - point_x) + (asteroid.y - point_y) * (asteroid.y - point_y)) < asteroid.size;
     }
 
     fn asteroids_draw(self: Self) void {
