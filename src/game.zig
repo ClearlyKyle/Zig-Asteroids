@@ -27,7 +27,7 @@ pub const Game = struct {
     asteroids: [MAX_NUMBER_OF_ASTEROIDS]Asteroid = undefined,
     asteroid_verticies: [20]vec2(f32) = undefined,
 
-    lives: u8 = 0,
+    alive: bool = true,
     score: u8 = 0,
 
     const Self = @This();
@@ -35,9 +35,7 @@ pub const Game = struct {
     pub fn draw(self: *const Self) void {
         self.asteroids_draw();
 
-        if (self.lives > 0) {
-            self.player.draw();
-        }
+        self.player.draw();
 
         for (self.bullets) |bullet| {
             if (bullet.visible)
@@ -72,13 +70,11 @@ pub const Game = struct {
             // Check Bullet collision with asteroid :D
             for (&self.asteroids, 0..) |*asteroid, asteroid_index| {
                 if (is_there_a_point_inside_the_asteroid(asteroid.*, self.bullets[index].x, self.bullets[index].y) and self.bullets[index].visible) {
-                    std.debug.print("Bullet hit an asteroid!\n", .{});
                     self.score += 1;
                     self.bullets[index].visible = false;
 
                     if (asteroid.size > 31.0) // Spawn two new smaller asteroids, baby asteroids
                     {
-                        std.debug.print("Drawing a new Asteroid\n", .{});
                         const asteroid_verticies_len = @intToFloat(f32, self.asteroid_verticies.len);
                         const angle1 = std.math.sin((@intToFloat(f32, asteroid_index) / asteroid_verticies_len) * (2.0 * std.math.pi));
                         const angle2 = std.math.cos((@intToFloat(f32, asteroid_index) / asteroid_verticies_len) * (2.0 * std.math.pi));
@@ -249,25 +245,9 @@ pub fn game_init() Game {
     }
 
     // Initial 2 astroids positions
-    game.asteroids[0] = Asteroid{
-        .x = SCREEN_WIDTH / 4.0,
-        .y = SCREEN_HEIGHT / 4.0,
-        .vel_x = 16.0,
-        .vel_y = -12.0,
-        .angle = 0.0,
-        .size = 64,
-    };
+    game.initialise_two_asteroids();
 
-    game.asteroids[1] = Asteroid{
-        .x = -SCREEN_WIDTH / 4.0,
-        .y = -SCREEN_HEIGHT / 4.0,
-        .vel_x = -10.0,
-        .vel_y = 6.0,
-        .angle = 0.0,
-        .size = 64,
-    };
-
-    game.lives = 5;
+    game.alive = true;
     game.score = 0;
 
     return game;
