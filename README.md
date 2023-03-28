@@ -1,6 +1,6 @@
 # Asteroids
 
-![Game Screenshot](https://raw.githubusercontent.com/ClearlyKyle/Zig-Asteroids/master/screenshot.PNG)
+![Game Screenshot](https://raw.githubusercontent.com/ClearlyKyle/Zig-Asteroids/master/screenshot.png)
 
 ### Requirements 
 * SDL 2.26.4
