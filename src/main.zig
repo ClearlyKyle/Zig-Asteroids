@@ -4,7 +4,7 @@ const SDL = Graphics.SDL;
 const Game = @import("game.zig");
 
 pub fn main() anyerror!void {
-    std.debug.print("Starting program!\n", .{});
+    std.debug.print("Starting!\n", .{});
 
     Graphics.init(800, 600, "Asteroids");
     defer Graphics.destroy();
@@ -63,6 +63,12 @@ pub fn main() anyerror!void {
 
         // Update all game components
         game.update(time_elapsed);
+
+        // When the player crashes into an asteroid, the game will restart
+        if (game.alive == false) {
+            std.debug.print("You crashed! restarting game\n", .{});
+            game = Game.game_init();
+        }
 
         // Draw the game
         game.draw();
